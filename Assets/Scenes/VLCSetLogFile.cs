@@ -15,6 +15,7 @@ public class VLCSetLogFile : MonoBehaviour
         Core.Initialize(Application.dataPath);
 
         _libVLC = new LibVLC(enableDebugLogs: true);
+        Debug.Log($"LibVLC Version: {_libVLC.Version}, Changeset: {_libVLC.Changeset}, Assembly version: {typeof(LibVLC).Assembly.GetName().Version}");
 
         Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
         
