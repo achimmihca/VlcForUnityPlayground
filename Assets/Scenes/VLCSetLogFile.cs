@@ -18,12 +18,15 @@ public class VLCSetLogFile : MonoBehaviour
         Debug.Log($"LibVLC Version: {_libVLC.Version}, Changeset: {_libVLC.Changeset}, Assembly version: {typeof(LibVLC).Assembly.GetName().Version}");
 
         Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        
+
+        // Log output to file
         string timeStamp = DateTime.Now.ToString("HHmmss");
         string logFile = Application.persistentDataPath + $"/vlc-{timeStamp}.txt";
         Debug.Log($"Logging vlc output to '{logFile}'");
         _libVLC.SetLogFile(logFile);
-        //_libVLC.Log += (s, e) => UnityEngine.Debug.Log(e.FormattedLog); // enable this for logs in the editor
+        
+        // Enable this for logs in the editor. Note that the log file is not used then.
+        // _libVLC.Log += (s, e) => Debug.Log(e.FormattedLog);
 
         PlayPause();
     }
@@ -40,12 +43,23 @@ public class VLCSetLogFile : MonoBehaviour
         _mediaPlayer.SetTime(_mediaPlayer.Time - seekTimeDelta);
     }
 
-    void OnDisable() 
+    private void OnDisable()
+    {
+        Dispose();
+    }
+
+    private void OnApplicationQuit()
+    {
+        Dispose();
+    }
+
+    void Dispose()
     {
         _mediaPlayer?.Stop();
         _mediaPlayer?.Dispose();
         _mediaPlayer = null;
 
+        _libVLC?.CloseLogFile();
         _libVLC?.Dispose();
         _libVLC = null;
     }
