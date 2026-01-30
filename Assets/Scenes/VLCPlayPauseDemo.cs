@@ -6,6 +6,7 @@ using TMPro;
 public class VLCPlayPauseDemo : MonoBehaviour
 {
     public TMP_Text timeLabel;
+    public TMP_Text frameLabel;
     
     LibVLC _libVLC;
     MediaPlayer _mediaPlayer;
@@ -96,7 +97,7 @@ public class VLCPlayPauseDemo : MonoBehaviour
 
     void Update()
     {
-        UpdateTimeLabel();
+        UpdateLabels();
         
         if(!playing) return;
 
@@ -111,8 +112,10 @@ public class VLCPlayPauseDemo : MonoBehaviour
         }
     }
 
-    private void UpdateTimeLabel()
+    private void UpdateLabels()
     {
+        frameLabel.text = $"Frame: {Time.frameCount}";
+        
         if (_mediaPlayer != null && _mediaPlayer.Media != null)
         {
             timeLabel.text = $"Time: {ToHumanReadableTime(_mediaPlayer.Time)}";
