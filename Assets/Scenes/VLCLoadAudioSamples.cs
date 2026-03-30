@@ -22,7 +22,7 @@ public class VLCLoadAudioSamples : MonoBehaviour
         Core.Initialize(Application.dataPath);
         Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 
-        string fileName = "Stone Sour - Through Glass - excerpt.ogg";
+        string fileName = "Stone Sour - Through Glass - excerpt2.ogg";
         string path = Application.streamingAssetsPath + $"/{fileName}";
 
         // PlayMedia(path);
@@ -74,7 +74,18 @@ public class VLCLoadAudioSamples : MonoBehaviour
         Debug.Log(
             $"LibVLC Version: {libVLC.Version}, Changeset: {libVLC.Changeset}, Assembly version: {typeof(LibVLC).Assembly.GetName().Version}");
 
+        using Media media = new Media(new Uri("file://" + absolutePath));
+        await media.ParseAsync(libVLC);
+        var audioTracks = media.TrackList(TrackType.Audio);
+        if (audioTracks.Count > 0)
+        {
+            channels = (int)audioTracks[0].Data.Audio.Channels;
+            sampleRate = (int)audioTracks[0].Data.Audio.Rate;
+        }
+        Debug.Log($"VLC media parsed. channels: {channels}, sampleRate: {sampleRate}");
+
         using MediaPlayer mediaPlayer = new MediaPlayer(libVLC);
+        mediaPlayer.Media = media;
 
         // Setup audio format and callbacks
         mediaPlayer.SetAudioFormat("FL32", (uint) sampleRate, (uint) channels);
@@ -110,13 +121,11 @@ public class VLCLoadAudioSamples : MonoBehaviour
             finished = true;
         };
 
-        using Media media = new Media(new Uri("file://" + absolutePath));
         // media.AddOption(":no-video");
         // media.AddOption(":no-spu");
         // media.AddOption(":clock-jitter=0");
         // media.AddOption(":clock-synchro=0");
         // media.AddOption(":no-audio-sync");
-        mediaPlayer.Media = media;
         Debug.Log($"Calling mediaPlayer.PlayAsync() for path: {absolutePath}");
         await mediaPlayer.PlayAsync();
 
