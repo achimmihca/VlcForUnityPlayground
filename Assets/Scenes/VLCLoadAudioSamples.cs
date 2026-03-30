@@ -64,6 +64,7 @@ public class VLCLoadAudioSamples : MonoBehaviour
         int channels = 2;
         int sampleRate = 48000;
         bool finished = false;
+        float timeBeforeLoading = Time.realtimeSinceStartup;
 
         // Use a separate LibVLC instance for loading to avoid side effects
         // and to pass specific options for fast decoding if possible.
@@ -153,7 +154,8 @@ public class VLCLoadAudioSamples : MonoBehaviour
             Debug.LogError($"VLC loading audio timed out for path: {absolutePath}. Current state: {mediaPlayer.State}");
         }
 
-        Debug.Log($"Stopping mediaPlayer and creating AudioClip. Samples captured: {capturedSamples.Count}");
+        TimeSpan duration = TimeSpan.FromSeconds(Time.realtimeSinceStartup - timeBeforeLoading);
+        Debug.Log($"Stopping mediaPlayer and creating AudioClip. Took {duration.TotalSeconds:F2} s, Samples captured: {capturedSamples.Count}");
         mediaPlayer.Stop();
 
         float[] allSamples;
